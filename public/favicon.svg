@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <style>
+      .bg { fill: #4d8b7d; }
+      .fruit { fill: #d4af37; }
+      .leaf { fill: #7cb342; }
+    </style>
+  </defs>
+  <rect class="bg" width="64" height="64" rx="12"/>
+  <circle class="fruit" cx="28" cy="28" r="12"/>
+  <circle class="fruit" cx="40" cy="32" r="10"/>
+  <path class="leaf" d="M 35 20 Q 45 15 50 25 Q 45 22 35 20" stroke="#7cb342" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <text x="32" y="50" font-size="14" font-weight="bold" fill="#fff" text-anchor="middle">BM</text>
+</svg>
