@@ -96,7 +96,7 @@ export function Footer() {
         </div>
         <div>
           <h4 className="mb-2 sm:mb-3 text-xs sm:text-sm uppercase tracking-widest text-gold">Contact</h4>
-          <p className="text-xs sm:text-sm opacity-80">Bobo-Dioulasso, Burkina Faso<br />contact@bobo-market.bf</p>
+          <p className="text-xs sm:text-sm opacity-80">Congo/Kinshasa<br />contact@bobo-market.bf</p>
         </div>
       </div>
       <div className="border-t border-sidebar-border/40 py-3 sm:py-4 text-center text-[10px] sm:text-xs opacity-60">

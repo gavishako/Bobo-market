@@ -9,8 +9,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { fcfa } from "@/lib/format";
 import { ArrowRight, Leaf, Truck, ShieldCheck, Clock } from "lucide-react";
 import hero from "@/assets/hero-market.jpg";
-import catFruits from "@/assets/cat-fruits.jpg";
-import catVeg from "@/assets/cat-vegetables.jpg";
 import heroCarousel1 from "@/assets/carousel-fruits-1.jpg";
 import heroCarousel2 from "@/assets/carousel-veg-1.jpg";
 import heroCarousel3 from "@/assets/carousel-fruits-2.jpg";
@@ -53,8 +51,7 @@ function useAvailableProducts() {
         .select("id,name,category,price_per_kg,stock_kg,available,product_images(url,position)")
         .eq("available", true)
         .gt("stock_kg", 0)
-        .order("created_at", { ascending: false })
-        .limit(8);
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data as (ProductWithImage & { stock_kg: number })[];
     },
@@ -85,12 +82,9 @@ function Home() {
               <p className="mt-2 sm:mt-3 md:mt-4 max-w-lg text-sm sm:text-base text-muted-foreground">
                 Livraison de fruits et légumes frais, importants et locaux et de saison, cueillis chez nos producteurs, déposés à votre porte.
               </p>
-              <div className="mt-4 sm:mt-6 flex flex-col gap-2">
+              <div className="mt-4 sm:mt-6">
                 <Button asChild size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Link to="/products">Découvrir la boutique <ArrowRight className="ml-2 h-3 w-3 sm:h-4 sm:w-4" /></Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/products" search={{ category: "fruit" } as any}>Voir les fruits</Link>
                 </Button>
               </div>
             </div>
@@ -104,8 +98,8 @@ function Home() {
       {/* CATEGORIES */}
       <section className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-10">
         <div className="grid gap-3 sm:gap-4 md:gap-6 md:grid-cols-2">
-          <CategoryCard title="Fruits" img={catFruits} to="/products" cat="fruit" />
-          <CategoryCard title="Légumes" img={catVeg} to="/products" cat="legume" />
+          <CategoryCard title="Fruits" img={heroCarousel1} to="/products" cat="fruit" />
+          <CategoryCard title="Légumes" img={heroCarousel2} to="/products" cat="legume" />
         </div>
       </section>
 
@@ -131,7 +125,7 @@ function Home() {
               {featured.map((p) => {
                 const img = [...(p.product_images ?? [])].sort((a, b) => a.position - b.position)[0]?.url;
                 return (
-                  <CarouselItem key={p.id} className="basis-full pl-2 sm:pl-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                  <CarouselItem key={p.id} className="basis-[78%] max-w-[18rem] pl-2 sm:pl-3 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                     <Link to="/products/$id" params={{ id: p.id }} className="group block">
                       <div className="overflow-hidden rounded-lg sm:rounded-xl bg-secondary">
                         {img ? (
@@ -206,7 +200,7 @@ function Home() {
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <div className="grid gap-6 rounded-3xl bg-primary p-8 text-primary-foreground md:grid-cols-3 md:p-12">
           <Value icon={<Leaf />} title="Frais du matin" desc="Cueillis et triés chaque jour avant la livraison." />
-          <Value icon={<Truck />} title="Livraison rapide" desc="Livré à votre porte partout dans Bobo-Dioulasso." />
+          <Value icon={<Truck />} title="Livraison rapide" desc="Livré à votre porte partout à Kinshasa." />
           <Value icon={<ShieldCheck />} title="Paiement flexible" desc="Mobile Money ou à la réception du colis." />
         </div>
       </section>
@@ -228,13 +222,13 @@ function Home() {
             <div className="p-8 md:p-12">
               <ul className="divide-y divide-border">
                 {[
-                  { day: "Lundi", hours: "08h00 — 18h00" },
-                  { day: "Mardi", hours: "08h00 — 18h00" },
-                  { day: "Mercredi", hours: "08h00 — 18h00" },
-                  { day: "Jeudi", hours: "08h00 — 18h00" },
-                  { day: "Vendredi", hours: "08h00 — 18h00" },
-                  { day: "Samedi", hours: "08h00 — 19h00" },
-                  { day: "Dimanche", hours: "09h00 — 14h00" },
+                  { day: "Lundi", hours: "08h00 — 16h00" },
+                  { day: "Mardi", hours: "08h00 — 16h00" },
+                  { day: "Mercredi", hours: "08h00 — 16h00" },
+                  { day: "Jeudi", hours: "08h00 — 16h00" },
+                  { day: "Vendredi", hours: "08h00 — 16h00" },
+                  { day: "Samedi", hours: "08h00 — 16h00" },
+                  { day: "Dimanche", hours: "08h00 — 16h00" },
                 ].map((s) => (
                   <li key={s.day} className="flex items-center justify-between py-3">
                     <span className="font-medium text-primary">{s.day}</span>

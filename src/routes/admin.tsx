@@ -2,6 +2,7 @@ import { Outlet, createFileRoute, Link, useNavigate } from "@tanstack/react-rout
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Package, Users, ClipboardList, Home } from "lucide-react";
+import logo from "@/assets/logo-bobo.jpg";
 
 export const Route = createFileRoute("/admin")({ component: AdminLayout });
 
@@ -22,8 +23,13 @@ function AdminLayout() {
   return (
     <div className="grid min-h-screen md:grid-cols-[240px_1fr]">
       <aside className="bg-sidebar p-6 text-sidebar-foreground">
-        <Link to="/" className="font-display text-2xl text-gold">Bobo-Market</Link>
-        <p className="mt-1 text-xs uppercase tracking-widest opacity-60">Admin</p>
+        <div className="flex items-center gap-3">
+          <img src={logo} alt="Bobo-Market" className="h-10 w-10 rounded-full object-contain" />
+          <div>
+            <div className="font-display text-2xl text-gold">Bobo-Market</div>
+            <div className="text-xs uppercase tracking-widest opacity-60">Admin</div>
+          </div>
+        </div>
         <nav className="mt-8 space-y-1 text-sm">
           <NavItem to="/admin" icon={<Home className="h-4 w-4" />}>Tableau de bord</NavItem>
           <NavItem to="/admin/products" icon={<Package className="h-4 w-4" />}>Produits</NavItem>

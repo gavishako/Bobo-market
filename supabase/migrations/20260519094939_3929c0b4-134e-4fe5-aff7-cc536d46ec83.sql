@@ -134,7 +134,9 @@ create policy "products_admin_all" on public.products for all using (public.has_
 
 -- product_images
 create policy "product_images_select_all" on public.product_images for select using (true);
-create policy "product_images_admin_all" on public.product_images for all using (public.has_role(auth.uid(), 'admin')) with check (public.has_role(auth.uid(), 'admin'));
+create policy "product_images_admin_insert" on public.product_images for insert with check (public.has_role(auth.uid(), 'admin'));
+create policy "product_images_admin_update" on public.product_images for update using (public.has_role(auth.uid(), 'admin')) with check (public.has_role(auth.uid(), 'admin'));
+create policy "product_images_admin_delete" on public.product_images for delete using (public.has_role(auth.uid(), 'admin'));
 
 -- orders
 create policy "orders_select_own" on public.orders for select using (auth.uid() = user_id);

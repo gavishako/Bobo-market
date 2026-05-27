@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
@@ -47,12 +47,20 @@ function AdminProducts() {
             <Button onClick={() => setEditing(null)}><Plus className="mr-2 h-4 w-4" />Nouveau produit</Button>
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-            <DialogHeader><DialogTitle>{editing ? "Modifier" : "Nouveau"} produit</DialogTitle></DialogHeader>
-            <ProductForm
-              initial={editing}
-              onDone={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-products"] }); qc.invalidateQueries({ queryKey: ["featured-products"] }); }}
-            />
-          </DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editing ? "Modifier" : "Nouveau"} produit</DialogTitle>
+            <DialogDescription>
+              {editing
+                ? "Modifiez les informations du produit existant et enregistrez."
+                : "Ajoutez un nouveau produit avec au moins 3 images."}
+            </DialogDescription>
+          </DialogHeader>
+          <ProductForm
+            key={editing?.id ?? "new"}
+            initial={editing}
+            onDone={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-products"] }); qc.invalidateQueries({ queryKey: ["featured-products"] }); }}
+          />
+        </DialogContent>
         </Dialog>
       </div>
 
@@ -98,6 +106,18 @@ function ProductForm({ initial, onDone }: { initial: any; onDone: () => void }) 
   const [existing, setExisting] = useState<any[]>(initial?.product_images ?? []);
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    setName(initial?.name ?? "");
+    setDescription(initial?.description ?? "");
+    setCategory(initial?.category ?? "fruit");
+    setPrice(Number(initial?.price_per_kg ?? 0));
+    setStock(Number(initial?.stock_kg ?? 0));
+    setFeatured(initial?.featured ?? false);
+    setAvailable(initial?.available ?? true);
+    setExisting(initial?.product_images ?? []);
+    setFiles([]);
+  }, [initial]);
+
   async function uploadFiles(productId: string) {
     const uploads: { url: string; position: number }[] = [];
     let pos = existing.length;
@@ -125,7 +145,8 @@ function ProductForm({ initial, onDone }: { initial: any; onDone: () => void }) 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const totalImages = existing.length + files.length;
-    if (totalImages < 3) return toast.error("Au moins 3 images sont requises.");
+    if (totalImages < 1) return toast.error("Au moins 1 image est requise.");
+    if (totalImages > 3) return toast.error("Au maximum 3 images sont autorisées.");
     setSaving(true);
     try {
       let id = initial?.id;
@@ -173,19 +194,19 @@ function ProductForm({ initial, onDone }: { initial: any; onDone: () => void }) 
       </div>
 
       <div>
-        <Label>Images (min. 3)</Label>
+        <Label>Images (1 à 3)</Label>
         {existing.length > 0 && (
           <div className="mt-2 grid grid-cols-4 gap-2">
             {existing.map((im) => (
               <div key={im.id} className="relative">
                 <img src={im.url} alt="" className="aspect-square w-full rounded object-cover" />
-                <button type="button" onClick={() => removeExisting(im.id)} className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-destructive-foreground"><Trash2 className="h-3 w-3" /></button>
+                <button type="button" aria-label="Supprimer l'image" onClick={() => removeExisting(im.id)} className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-destructive-foreground"><Trash2 className="h-3 w-3" /></button>
               </div>
             ))}
           </div>
         )}
         <Input type="file" accept="image/*" multiple className="mt-2" onChange={(e) => setFiles(Array.from(e.target.files ?? []))} />
-        <p className="mt-1 text-xs text-muted-foreground">{existing.length} existante(s) + {files.length} nouvelle(s) = {existing.length + files.length} (min. 3)</p>
+        <p className="mt-1 text-xs text-muted-foreground">{existing.length} existante(s) + {files.length} nouvelle(s) = {existing.length + files.length} (entre 1 et 3)</p>
       </div>
 
       <Button type="submit" disabled={saving} className="w-full">{saving ? "…" : "Enregistrer"}</Button>

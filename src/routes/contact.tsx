@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Header, Footer } from "@/components/site-chrome";
 import { Phone, Mail, MapPin, Clock, Truck, Music2 } from "lucide-react";
+import logo from "@/assets/logo-bobo.jpg";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -19,17 +20,25 @@ function ContactPage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <section className="mx-auto max-w-5xl px-6 py-16 md:py-24">
-        <p className="text-xs uppercase tracking-widest text-gold">Nous sommes Bobo-Market</p>
+      <section className="mx-auto max-w-5xl px-6 py-10 md:py-16">
+        <div className="flex items-center gap-4">
+          <img src={logo} alt="Bobo-Market" className="h-14 w-14 rounded-full object-contain" />
+          <div>
+            <div className="font-display text-2xl text-primary">Bobo-Market</div>
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">Contact</div>
+          </div>
+        </div>
+
+        <p className="mt-6 text-xs uppercase tracking-widest text-gold">Nous sommes Bobo-Market</p>
         <p className="mt-2 font-display text-2xl text-muted-foreground">votre partenaire de confiance</p>
-        <h1 className="mt-6 font-display text-5xl leading-tight text-primary md:text-7xl">
+        <h1 className="mt-4 font-display text-5xl leading-tight text-primary md:text-6xl">
           La qualité est<br /><em className="text-gold">notre signature</em>.
         </h1>
-        <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
+        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
           Nous sommes spécialisés dans la vente de fruits et légumes importés, locaux et divers.
         </p>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2">
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
           <Card icon={<Phone className="h-5 w-5" />} title="Téléphone">
             <a href="tel:+243808884449" className="block hover:text-primary">+243 80 888 4449</a>
             <a href="tel:+243823539530" className="block hover:text-primary">+243 82 353 9530</a>
@@ -41,8 +50,8 @@ function ContactPage() {
             <span>BOBO-MARKET</span>
           </Card>
           <Card icon={<Clock className="h-5 w-5" />} title="Horaires">
-            <p>Du lundi au samedi</p>
-            <p className="text-muted-foreground">07h30 – 16h30 (fermé le dimanche)</p>
+            <p>Du lundi au dimanche</p>
+            <p className="text-muted-foreground">08h00 – 16h00</p>
           </Card>
           <Card icon={<MapPin className="h-5 w-5" />} title="Adresses" wide>
             <p>N°3, 13ème Rue Limeté industrielle — réf. Radio Elikya.</p>
