@@ -243,6 +243,14 @@ function Home() {
 
 
 
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="rounded-3xl border border-border bg-card p-6 text-sm text-muted-foreground sm:p-8">
+          <p>
+            Consommer chaque jour une grande variété <span className="text-primary">de fruits et légumes</span> réduit le risque de mourir de maladies chroniques.
+          </p>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
@@ -294,3 +302,4 @@ function HeroCarousel() {
     </div>
   );
 }
+
