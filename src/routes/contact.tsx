@@ -20,7 +20,7 @@ function ContactPage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <section className="mx-auto max-w-5xl px-6 py-10 md:py-16">
+      <section className="w-full py-10">
         <div className="flex items-center gap-4">
           <img src={logo} alt="Bobo-Market" className="h-14 w-14 rounded-full object-contain" />
           <div>
@@ -34,7 +34,7 @@ function ContactPage() {
         <h1 className="mt-4 font-display text-5xl leading-tight text-primary md:text-6xl">
           La qualité est<br /><em className="text-gold">notre signature</em>.
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+        <p className="mt-4 text-lg text-muted-foreground">
           Nous sommes spécialisés dans la vente de fruits et légumes importés, locaux et divers.
         </p>
 
@@ -50,8 +50,10 @@ function ContactPage() {
             <span>BOBO-MARKET</span>
           </Card>
           <Card icon={<Clock className="h-5 w-5" />} title="Horaires">
-            <p>Du lundi au dimanche</p>
-            <p className="text-muted-foreground">08h00 – 16h00</p>
+            <p>Du lundi au samedi</p>
+            <p className="text-muted-foreground">07h30 – 16h00</p>
+            <p className="mt-2">Dimanche</p>
+            <p className="text-muted-foreground">07h30 – 12h30</p>
           </Card>
           <Card icon={<MapPin className="h-5 w-5" />} title="Adresses" wide>
             <p>N°3, 13ème Rue Limeté industrielle — réf. Radio Elikya.</p>

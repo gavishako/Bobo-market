@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { normalizeProductImageUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { fcfa } from "@/lib/format";
@@ -43,30 +44,27 @@ function AdminProducts() {
       <div className="flex items-center justify-between">
         <h1 className="font-display text-4xl text-primary">Produits</h1>
         <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (!o) setEditing(null); }}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setEditing(null)}><Plus className="mr-2 h-4 w-4" />Nouveau produit</Button>
-          </DialogTrigger>
+          <Button type="button" onClick={() => { setEditing(null); setOpen(true); }}><Plus className="mr-2 h-4 w-4" />Nouveau produit</Button>
           <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editing ? "Modifier" : "Nouveau"} produit</DialogTitle>
-            <DialogDescription>
-              {editing
-                ? "Modifiez les informations du produit existant et enregistrez."
-                : "Ajoutez un nouveau produit avec au moins 3 images."}
-            </DialogDescription>
-          </DialogHeader>
-          <ProductForm
-            key={editing?.id ?? "new"}
-            initial={editing}
-            onDone={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-products"] }); qc.invalidateQueries({ queryKey: ["featured-products"] }); }}
-          />
-        </DialogContent>
+              <DialogDescription>
+                {editing
+                  ? "Modifiez les informations du produit existant et enregistrez."
+                  : "Ajoutez un nouveau produit avec au moins 3 images."}
+              </DialogDescription>
+            </DialogHeader>
+            <ProductForm
+              initial={editing}
+              onDone={() => { setOpen(false); setEditing(null); qc.invalidateQueries({ queryKey: ["admin-products"] }); qc.invalidateQueries({ queryKey: ["featured-products"] }); }}
+            />
+          </DialogContent>
         </Dialog>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {data.map((p: any) => {
-          const img = [...(p.product_images ?? [])].sort((a: any, b: any) => a.position - b.position)[0]?.url;
+          const img = normalizeProductImageUrl([...(p.product_images ?? [])].sort((a: any, b: any) => a.position - b.position)[0]?.url);
           return (
             <div key={p.id} className="overflow-hidden rounded-xl bg-card shadow-sm">
               {img ? <img src={img} alt={p.name} className="aspect-video w-full object-cover" /> : <div className="aspect-video bg-muted" />}
@@ -199,7 +197,7 @@ function ProductForm({ initial, onDone }: { initial: any; onDone: () => void }) 
           <div className="mt-2 grid grid-cols-4 gap-2">
             {existing.map((im) => (
               <div key={im.id} className="relative">
-                <img src={im.url} alt="" className="aspect-square w-full rounded object-cover" />
+                <img src={normalizeProductImageUrl(im.url)} alt="" className="aspect-square w-full rounded object-cover" />
                 <button type="button" aria-label="Supprimer l'image" onClick={() => removeExisting(im.id)} className="absolute right-1 top-1 rounded-full bg-destructive p-1 text-destructive-foreground"><Trash2 className="h-3 w-3" /></button>
               </div>
             ))}

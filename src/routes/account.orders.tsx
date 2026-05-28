@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Header, Footer } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
-import { fcfa } from "@/lib/format";
+import { fcfa, frDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/account/orders")({ component: OrdersPage });
 
@@ -49,7 +49,7 @@ function OrdersPage() {
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                   <div>
                     <div className="font-display text-base sm:text-lg">Commande #{o.id.slice(0, 8)}</div>
-                    <div className="text-[10px] sm:text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString("fr-FR")}</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground">{frDateTime(o.created_at)}</div>
                   </div>
                   <div className="flex flex-wrap gap-1 sm:gap-2">
                     <span className="rounded-full bg-secondary px-2 sm:px-3 py-0.5 sm:py-1 text-[9px] sm:text-xs">{STATUS_LABEL[o.status]}</span>

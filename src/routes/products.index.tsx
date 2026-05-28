@@ -36,21 +36,21 @@ function ProductsList() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="mx-auto w-full max-w-7xl px-3 sm:px-4 md:px-6 py-8 sm:py-10 md:py-12">
-        <Button asChild variant="ghost" size="sm" className="mb-4 sm:mb-6 -ml-2">
-          <Link to="/"><ArrowLeft className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />Retour à l'accueil</Link>
+      <div className="w-full py-8">
+        <Button asChild variant="secondary" size="lg" className="mb-6 rounded-xl">
+          <Link to="/" className="text-sm sm:text-base"><ArrowLeft className="mr-2 h-4 w-4" />Retour à l'accueil</Link>
         </Button>
-        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-8 flex flex-wrap items-end gap-4">
           <div>
-            <p className="text-[10px] sm:text-xs uppercase tracking-widest text-gold">Boutique</p>
-            <h1 className="font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-primary leading-tight">
+            <p className="text-xs uppercase tracking-widest text-gold">Boutique</p>
+            <h1 className="font-display text-5xl text-primary">
               {category === "fruit" ? "Nos fruits" : category === "legume" ? "Nos légumes" : "Tous les produits"}
             </h1>
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            <Button asChild variant={!category ? "default" : "outline"} size="sm" className="text-xs sm:text-sm"><Link to="/products">Tout</Link></Button>
-            <Button asChild variant={category === "fruit" ? "default" : "outline"} size="sm" className="text-xs sm:text-sm"><Link to="/products" search={{ category: "fruit" } as any}>Fruits</Link></Button>
-            <Button asChild variant={category === "legume" ? "default" : "outline"} size="sm" className="text-xs sm:text-sm"><Link to="/products" search={{ category: "legume" } as any}>Légumes</Link></Button>
+          <div className="flex gap-2">
+            <Button asChild variant={!category ? "default" : "outline"} size="sm"><Link to="/products">Tout</Link></Button>
+            <Button asChild variant={category === "fruit" ? "default" : "outline"} size="sm"><Link to="/products" search={{ category: "fruit" } as any}>Fruits</Link></Button>
+            <Button asChild variant={category === "legume" ? "default" : "outline"} size="sm"><Link to="/products" search={{ category: "legume" } as any}>Légumes</Link></Button>
           </div>
         </div>
 
@@ -61,18 +61,18 @@ function ProductsList() {
             Aucun produit disponible pour le moment.
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {data.map((p: any) => {
               const img = [...(p.product_images ?? [])].sort((a: any, b: any) => a.position - b.position)[0]?.url;
               return (
-                <Link key={p.id} to="/products/$id" params={{ id: p.id }} className="group block overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl bg-card shadow-sm transition hover:shadow-[var(--shadow-elegant)]">
+                <Link key={p.id} to="/products/$id" params={{ id: p.id }} className="group block overflow-hidden bg-card shadow-sm transition hover:shadow-[var(--shadow-elegant)]">
                   {img ? <img src={img} alt={p.name} loading="lazy" className="aspect-square w-full object-cover transition group-hover:scale-105" /> : <div className="aspect-square bg-muted" />}
-                  <div className="p-3 sm:p-4">
-                    <div className="text-[8px] sm:text-[9px] uppercase tracking-widest text-muted-foreground">{p.category === "fruit" ? "Fruit" : "Légume"}</div>
-                    <h3 className="font-display text-base sm:text-lg md:text-xl text-primary line-clamp-2">{p.name}</h3>
-                    <div className="mt-2 flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1">
-                      <span className="text-sm sm:text-base font-semibold">{fcfa(p.price_per_kg)} <span className="text-[8px] sm:text-xs font-normal text-muted-foreground">/kg</span></span>
-                      <span className="text-[8px] sm:text-xs text-muted-foreground">Stock: {p.stock_kg}kg</span>
+                  <div className="p-4">
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">{p.category === "fruit" ? "Fruit" : "Légume"}</div>
+                    <h3 className="font-display text-2xl text-primary">{p.name}</h3>
+                    <div className="mt-2 flex items-baseline justify-between">
+                      <span className="text-lg font-semibold">{fcfa(p.price_per_kg)} <span className="text-xs font-normal text-muted-foreground">/kg</span></span>
+                      <span className="text-xs text-muted-foreground">Stock: {p.stock_kg} kg</span>
                     </div>
                   </div>
                 </Link>

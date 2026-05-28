@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { fcfa } from "@/lib/format";
+import { fcfa, frDateTime } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/orders")({ component: AdminOrders });
@@ -37,7 +37,7 @@ function AdminOrders() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="font-display text-xl">#{o.id.slice(0, 8)}</div>
-                <div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString("fr-FR")}</div>
+                <div className="text-xs text-muted-foreground">{frDateTime(o.created_at)}</div>
                 <div className="mt-1 text-sm">{o.profiles?.full_name || o.profiles?.email} · {o.phone}</div>
                 <div className="text-sm text-muted-foreground">{o.delivery_address}</div>
               </div>

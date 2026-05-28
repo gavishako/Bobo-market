@@ -6,6 +6,7 @@ import { Header, Footer } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fcfa } from "@/lib/format";
+import { normalizeProductImageUrl } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "sonner";
 import { ShoppingBasket, Minus, Plus } from "lucide-react";
@@ -44,7 +45,7 @@ function ProductDetail() {
       name: data.name,
       price_per_kg: Number(data.price_per_kg),
       quantity_kg: qty,
-      image: images[0]?.url,
+      image: normalizeProductImageUrl(images[0]?.url),
     });
     toast.success(`${data.name} ajouté au panier`);
   }
@@ -52,16 +53,21 @@ function ProductDetail() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="mx-auto w-full grid max-w-6xl gap-6 sm:gap-8 md:gap-10 px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12 md:grid-cols-2">
+      <div className="w-full grid gap-6 md:gap-10 py-6 md:grid-cols-2">
         <div>
-          <div className="overflow-hidden rounded-lg sm:rounded-xl md:rounded-2xl bg-secondary">
-            {images[activeImg] ? <img src={images[activeImg].url} alt={data.name} className="aspect-square w-full object-cover" /> : <div className="aspect-square bg-muted" />}
+          <div className="overflow-hidden bg-secondary">
+            {images[activeImg] ? <img src={normalizeProductImageUrl(images[activeImg].url)} alt={data.name} className="aspect-square w-full object-cover" /> : <div className="aspect-square bg-muted" />}
           </div>
           {images.length > 1 && (
             <div className="mt-3 grid grid-cols-4 sm:grid-cols-5 gap-2">
               {images.map((im: any, i: number) => (
-                <button key={i} onClick={() => setActiveImg(i)} className={`overflow-hidden rounded-md sm:rounded-lg border-2 ${i === activeImg ? "border-primary" : "border-transparent"}`}>
-                  <img src={im.url} alt="" className="aspect-square w-full object-cover" loading="lazy" />
+                <button
+                  key={i}
+                  onClick={() => setActiveImg(i)}
+                  className={`overflow-hidden border-2 ${i === activeImg ? "border-primary" : "border-transparent"}`}
+                  title={`Voir l'image ${i + 1}`}
+                >
+                  <img src={normalizeProductImageUrl(im.url)} alt="" className="aspect-square w-full object-cover" loading="lazy" />
                 </button>
               ))}
             </div>
@@ -69,9 +75,9 @@ function ProductDetail() {
         </div>
         <div className="flex flex-col justify-start">
           <p className="text-[10px] sm:text-xs uppercase tracking-widest text-gold">{data.category === "fruit" ? "Fruit" : "Légume"}</p>
-          <h1 className="mt-1 sm:mt-2 font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-primary">{data.name}</h1>
-          <p className="mt-2 sm:mt-3 text-xl sm:text-2xl md:text-3xl font-semibold">{fcfa(Number(data.price_per_kg))} <span className="text-sm sm:text-base font-normal text-muted-foreground">/ kg</span></p>
-          {data.description && <p className="mt-3 sm:mt-4 md:mt-6 text-sm text-muted-foreground">{data.description}</p>}
+          <h1 className="mt-1 font-display text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-primary">{data.name}</h1>
+          <p className="mt-2 text-xl sm:text-2xl md:text-3xl font-semibold">{fcfa(Number(data.price_per_kg))} <span className="text-sm sm:text-base font-normal text-muted-foreground">/ kg</span></p>
+          {data.description && <p className="mt-3 text-sm text-muted-foreground">{data.description}</p>}
 
           <div className="mt-6 sm:mt-8">
             <label className="text-xs uppercase tracking-widest text-muted-foreground">Quantité (kg)</label>
@@ -84,8 +90,8 @@ function ProductDetail() {
           </div>
 
           <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <Button className="flex-1" size="sm" sm:size="lg" onClick={addToCart}><ShoppingBasket className="mr-2 h-3 w-3 sm:h-4 sm:w-4" /> <span className="text-xs sm:text-base">Ajouter au panier</span></Button>
-            <Button className="flex-1" size="sm" sm:size="lg" variant="outline" onClick={() => { addToCart(); navigate({ to: "/cart" }); }}><span className="text-xs sm:text-base">Commander</span></Button>
+            <Button className="flex-1 text-sm sm:text-base" size="lg" onClick={addToCart}><ShoppingBasket className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> <span>Ajouter au panier</span></Button>
+            <Button className="flex-1 text-sm sm:text-base" size="lg" variant="outline" onClick={() => { addToCart(); navigate({ to: "/cart" }); }}><span>Commander</span></Button>
           </div>
 
           {data.stock_kg < 5 && <p className="mt-4 text-xs sm:text-sm text-destructive">Plus que {data.stock_kg} kg en stock !</p>}
