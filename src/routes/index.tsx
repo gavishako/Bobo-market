@@ -77,14 +77,14 @@ function Home() {
         </div>
         <div className="w-full py-10">
           <div className="flex flex-row items-center gap-4 sm:gap-6 lg:grid lg:grid-cols-2 lg:gap-14 xl:gap-16">
-            <div className="flex-1">
-              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[4.2rem] xl:text-[5rem] leading-tight text-primary">
+            <div className="flex-1 ml-0 md:ml-8 lg:ml-16 xl:ml-24 2xl:ml-32 max-w-2xl">
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-[4.2rem] xl:text-[5rem] leading-tight text-primary text-center md:text-left">
                 Le marché du jour,<br /><em className="text-[oklch(0.85_0.20_130)] text-2xl sm:text-3xl md:text-4xl lg:text-[2.8rem] xl:text-[3.2rem]">livré à Kinshasa</em>.
               </h1>
-              <p className="mt-4 sm:mt-5 md:mt-6 text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-muted-foreground">
+              <p className="mt-4 sm:mt-5 md:mt-6 text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-muted-foreground text-center md:text-left">
                 Livraison de fruits, légumes et divers, importés et locaux et de saison, cueillis chez nos producteurs, déposés à votre porte.
               </p>
-              <div className="mt-6 sm:mt-7">
+              <div className="mt-6 sm:mt-7 flex justify-center md:justify-start">
                 <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-4 sm:px-7 sm:py-5 text-base sm:text-lg lg:text-xl">
                   <Link to="/products">Découvrir la boutique <ArrowRight className="ml-2 h-5 w-5" /></Link>
                 </Button>

@@ -16,24 +16,24 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div className="w-full flex h-20 lg:h-28 items-end justify-between px-0">
-        <Link to="/" className="flex flex-row items-center gap-1 min-w-0 lg:pb-2">
+      <div className="w-full flex h-12 lg:h-16 items-start justify-between px-0">
+        <Link to="/" className="flex flex-row items-center gap-1 min-w-0">
           <img src={logo} alt="Bobo-Market" className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 rounded-full object-contain flex-shrink-0" />
-          <div className="leading-tight min-w-0 flex flex-col justify-center">
+          <div className="leading-tight min-w-0 flex flex-col justify-center -mt-3">
             <div className="font-display text-base sm:text-lg lg:text-xl xl:text-2xl text-primary truncate">Bobo-Market</div>
             <div className="text-[9px] sm:text-xs lg:text-sm xl:text-base uppercase tracking-[0.18em] text-muted-foreground truncate">Votre partenaire</div>
           </div>
         </Link>
 
-        <nav className="hidden gap-6 sm:gap-8 text-lg sm:text-xl lg:text-2xl xl:text-3xl md:flex items-end">
+        <nav className="hidden gap-6 sm:gap-8 text-lg sm:text-xl lg:text-2xl xl:text-3xl md:flex items-start">
           <Link to="/" className="hover:text-primary transition-colors" activeOptions={{ exact: true }} activeProps={{ className: "text-primary font-semibold" }}>Accueil</Link>
           <Link to="/products" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary font-semibold" }}>Boutique</Link>
-          <Link to="/products" search={{ category: "fruit" } as any} className="hover:text-primary transition-colors">Fruits</Link>
-          <Link to="/products" search={{ category: "legume" } as any} className="hover:text-primary transition-colors">Légumes</Link>
+          <Link to="/products" search={{ category: "fruit" } as any} className="hover:text-primary transition-colors ml-2">Fruits</Link>
+          <Link to="/products" search={{ category: "legume" } as any} className="hover:text-primary transition-colors mr-2">Légumes</Link>
           <Link to="/contact" className="hover:text-primary transition-colors" activeProps={{ className: "text-primary font-semibold" }}>Contact</Link>
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-start gap-2 sm:gap-3">
           <Button variant="ghost" size="lg" onClick={() => router.navigate({ to: "/cart" })} className="relative p-3 sm:p-4 lg:p-5">
             <ShoppingBasket className="h-8 w-8 sm:h-10 sm:w-10" />
             {count > 0 && (
@@ -78,7 +78,7 @@ export function Header() {
 
 export function Footer() {
   return (
-    <footer className="mt-16 sm:mt-20 md:mt-24 border-t border-border bg-sidebar text-sidebar-foreground">
+    <footer className="bg-sidebar text-sidebar-foreground">
       <div className="mx-auto grid max-w-7xl gap-8 sm:gap-10 px-4 sm:px-6 py-8 sm:py-12 grid-cols-1 sm:grid-cols-3">
         <div>
           <div className="font-display text-xl sm:text-2xl text-gold">Bobo-Market</div>
