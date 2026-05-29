@@ -29,6 +29,10 @@ function ProductsList() {
       if (category) q = q.eq("category", category);
       const { data, error } = await q;
       if (error) throw error;
+      // Ajout du log pour debug
+      if (typeof window !== "undefined") {
+        console.log("Réponse Supabase produits:", data);
+      }
       return data ?? [];
     },
   });
