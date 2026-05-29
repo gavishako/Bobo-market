@@ -46,14 +46,12 @@ function useFeaturedProducts() {
 
 function useAvailableProducts() {
   return useQuery({
-    queryKey: ["available-products"],
+    queryKey: ["all-products"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
         .select("id,name,category,price_per_kg,stock_kg,available,product_images(url,position)")
-        .eq("available", true)
-        .gt("stock_kg", 0)
-        .order("created_at", { ascending: false }); // Suppression de .limit(8)
+        .order("created_at", { ascending: false });
       if (error) throw error;
       return data as (ProductWithImage & { stock_kg: number })[];
     },
@@ -171,12 +169,18 @@ function Home() {
         ) : (
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {available.map((p) => {
-              const img = [...(p.product_images ?? [])].sort((a, b) => a.position - b.position)[0]?.url;
+              const img = (p.product_images && p.product_images.length > 0)
+                ? p.product_images.find(img => !!img.url)?.url
+                : undefined;
               return (
                 <Link key={p.id} to="/products/$id" params={{ id: p.id }} className="group block overflow-hidden bg-card shadow-sm transition hover:shadow-[var(--shadow-elegant)]">
                   {img ? (
                     <img src={img} alt={p.name} loading="lazy" className="aspect-square w-full max-w-[220px] lg:max-w-[280px] mx-auto object-cover transition group-hover:scale-105" />
-                  ) : <div className="aspect-square bg-muted max-w-[220px] lg:max-w-[280px] mx-auto" />}
+                  ) : (
+                    <div className="aspect-square bg-muted max-w-[220px] lg:max-w-[280px] mx-auto flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground text-center px-2">Image manquante</span>
+                    </div>
+                  )}
                   <div className="p-3 sm:p-4 md:p-5">
                     <div className="flex items-center justify-between gap-3 mb-2">
                       <div className="text-xs sm:text-sm lg:text-base uppercase tracking-widest text-muted-foreground">{p.category === "fruit" ? "Fruit" : "Légume"}</div>

@@ -1,0 +1,26 @@
+Liste des images manquantes à ajouter dans public/products pour correspondre au script SQL :
+
+- pomme-rouge-verte.jpg
+- orange.jpg
+- mandarine.jpg
+- kiwi.jpg
+- fraise.jpg
+- passion.jpg
+- papaye.jpg
+- chou-fleur.jpg
+- brocolis.jpg
+- poivrons-rouges-jaunes.jpg
+- poivrons-verts.jpg
+- betterave.jpg
+- pomme-de-terre.jpg
+- ail.jpg
+- oignons.jpg
+- ciboulette.jpg
+- mathe.jpg
+
+Astuce :
+- Place chaque image dans le dossier public/products.
+- Les noms doivent correspondre exactement à ceux listés ci-dessus.
+- Si tu veux, je peux générer des images factices (placeholders) pour chaque nom manquant.
+
+Dis-moi si tu veux que je crée ces images factices automatiquement.
