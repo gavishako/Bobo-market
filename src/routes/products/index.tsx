@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { fcfa } from "@/lib/format";
+import { normalizeProductImageUrl } from "@/lib/utils";
 
 export const Route = createFileRoute("/products/")({
   component: ProductsList,
@@ -63,6 +64,44 @@ const LOCAL_PRODUCTS: CatalogProduct[] = Array.from({ length: 44 }, (_, index) =
   };
 });
 
+const NAME_TO_IMAGE: Record<string, string> = {
+  tomate: "tomates.jpg",
+  ananas: "ananas.jpg",
+  gingembre: "gingembre.jpg",
+  chou: "chou.jpg",
+  carotte: "carottes.jpg",
+  champignon: "champignons.jpg",
+  passion: "passion.jpg",
+  "pomme de terre": "pomme-de-terre.jpg",
+  orange: "orange.jpg",
+  pomme: "pomme-rouge-verte.jpg",
+  mandarine: "mandarine.jpg",
+  kiwi: "kiwi.jpg",
+  fraise: "fraise.jpg",
+  "chou fleur": "chou-fleur.jpg",
+  ciboulette: "ciboulette.jpg",
+  betterave: "betterave.jpg",
+  papaye: "papaye.jpg",
+  poivron: "poivrons-verts.jpg",
+  ail: "ail.jpg",
+  oignon: "oignons.jpg",
+  brocoli: "brocolis.jpg",
+  avocat: "avocat.jpg",
+  banane: "bananes.jpg",
+  mangue: "mangues.jpg",
+  raisin: "raisins.jpg",
+};
+
+function pickImageByProductName(name: string) {
+  const normalizedName = name.toLowerCase();
+  for (const [key, fileName] of Object.entries(NAME_TO_IMAGE)) {
+    if (normalizedName.includes(key)) {
+      return `/products/${fileName}`;
+    }
+  }
+  return "/products/placeholder.svg";
+}
+
 function normalizeProductName(name: string | null | undefined) {
   return (name ?? "").trim().toLowerCase();
 }
@@ -101,7 +140,7 @@ function ProductsList() {
           name: product.name,
           category: product.category,
           price_per_kg: Number(product.price_per_kg ?? 0),
-          image_url: `/products/${product.id}.jpg`,
+          image_url: pickImageByProductName(product.name),
         }));
 
         setProducts(mergeWithLocalFallback(productsFromDb));
@@ -132,7 +171,7 @@ function ProductsList() {
           <CardHeader>{product.name}</CardHeader>
           <CardContent>
             <img
-              src={product.image_url || `/products/${product.id}.jpg`}
+              src={normalizeProductImageUrl(product.image_url) || "/products/placeholder.svg"}
               alt={product.name}
               className="w-full h-32 object-cover mb-2"
               onError={e => (e.currentTarget.src = "/products/placeholder.svg")}

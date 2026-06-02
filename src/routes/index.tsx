@@ -7,6 +7,7 @@ import { Header, Footer } from "@/components/site-chrome";
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { fcfa } from "@/lib/format";
+import { normalizeProductImageUrl } from "@/lib/utils";
 import { ArrowRight, Leaf, Truck, ShieldCheck, Clock } from "lucide-react";
 import hero from "@/assets/hero-market.jpg";
 import catFruits from "@/assets/cat-fruits.jpg";
@@ -123,13 +124,15 @@ function Home() {
           <Carousel opts={{ align: "start", loop: true }} plugins={[autoplay.current]} className="w-full">
             <CarouselContent>
               {featured.map((p) => {
-                const img = [...(p.product_images ?? [])].sort((a, b) => a.position - b.position)[0]?.url;
+                const img = normalizeProductImageUrl(
+                  [...(p.product_images ?? [])].sort((a, b) => a.position - b.position)[0]?.url,
+                );
                 return (
                   <CarouselItem key={p.id} className="basis-[45%] max-w-[260px] lg:max-w-[320px] pl-2 sm:pl-3">
                     <Link to="/products/$id" params={{ id: p.id }} className="group block">
                       <div className="overflow-hidden bg-secondary">
                         {img ? (
-                          <img src={img} alt={p.name} loading="lazy" className="aspect-square w-full max-w-[220px] lg:max-w-[280px] mx-auto object-cover transition-transform duration-500 group-hover:scale-105" />
+                          <img src={img} alt={p.name} loading="lazy" className="aspect-square w-full max-w-[220px] lg:max-w-[280px] mx-auto object-cover transition-transform duration-500 group-hover:scale-105" onError={(e) => { e.currentTarget.src = "/products/placeholder.svg"; }} />
                         ) : <div className="aspect-square bg-muted max-w-[220px] lg:max-w-[280px] mx-auto" />}
                       </div>
                       <div className="mt-2 flex flex-col gap-1">
@@ -170,12 +173,12 @@ function Home() {
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {available.map((p) => {
               const img = (p.product_images && p.product_images.length > 0)
-                ? p.product_images.find(img => !!img.url)?.url
+                ? normalizeProductImageUrl(p.product_images.find(img => !!img.url)?.url)
                 : undefined;
               return (
                 <Link key={p.id} to="/products/$id" params={{ id: p.id }} className="group block overflow-hidden bg-card shadow-sm transition hover:shadow-[var(--shadow-elegant)]">
                   {img ? (
-                    <img src={img} alt={p.name} loading="lazy" className="aspect-square w-full max-w-[220px] lg:max-w-[280px] mx-auto object-cover transition group-hover:scale-105" />
+                    <img src={img} alt={p.name} loading="lazy" className="aspect-square w-full max-w-[220px] lg:max-w-[280px] mx-auto object-cover transition group-hover:scale-105" onError={(e) => { e.currentTarget.src = "/products/placeholder.svg"; }} />
                   ) : (
                     <div className="aspect-square bg-muted max-w-[220px] lg:max-w-[280px] mx-auto flex items-center justify-center">
                       <span className="text-xs text-muted-foreground text-center px-2">Image manquante</span>
