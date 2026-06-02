@@ -65,7 +65,7 @@ function pickImageByProductName(name: string) {
 function ProductsList() {
   const { category } = useSearch({ from: "/products/" });
   const [products, setProducts] = useState<CatalogProduct[]>([]);
-  const [activeCategory, setActiveCategory] = useState<"fruit" | "legume">(category === "legume" ? "legume" : "fruit");
+  const [activeCategory, setActiveCategory] = useState<"fruit" | "legume" | null>(category ?? null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,7 +107,7 @@ function ProductsList() {
   }, []);
 
   useEffect(() => {
-    setActiveCategory(category === "legume" ? "legume" : "fruit");
+    setActiveCategory(category ?? null);
   }, [category]);
 
   useEffect(() => {
@@ -137,7 +137,7 @@ function ProductsList() {
   }, [fetchProducts]);
 
   const filteredProducts = useMemo(
-    () => products.filter((product) => product.category === activeCategory),
+    () => (activeCategory ? products.filter((product) => product.category === activeCategory) : products),
     [products, activeCategory],
   );
 
@@ -155,14 +155,14 @@ function ProductsList() {
         <Button
           type="button"
           variant={activeCategory === "fruit" ? "default" : "outline"}
-          onClick={() => setActiveCategory("fruit")}
+          onClick={() => setActiveCategory((current) => (current === "fruit" ? null : "fruit"))}
         >
           Fruits
         </Button>
         <Button
           type="button"
           variant={activeCategory === "legume" ? "default" : "outline"}
-          onClick={() => setActiveCategory("legume")}
+          onClick={() => setActiveCategory((current) => (current === "legume" ? null : "legume"))}
         >
           Légumes
         </Button>
