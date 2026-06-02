@@ -173,7 +173,11 @@ function Home() {
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {available.map((p) => {
               const img = (p.product_images && p.product_images.length > 0)
-                ? normalizeProductImageUrl(p.product_images.find(img => !!img.url)?.url)
+                ? normalizeProductImageUrl(
+                    [...p.product_images]
+                      .sort((a, b) => a.position - b.position)
+                      .find((image) => !!image.url)?.url,
+                  )
                 : undefined;
               return (
                 <Link key={p.id} to="/products/$id" params={{ id: p.id }} className="group block overflow-hidden bg-card shadow-sm transition hover:shadow-[var(--shadow-elegant)]">

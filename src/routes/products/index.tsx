@@ -1,12 +1,18 @@
-import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { Header, Footer } from "@/components/site-chrome";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { fcfa } from "@/lib/format";
 import { normalizeProductImageUrl } from "@/lib/utils";
+import { z } from "zod";
+
+const searchSchema = z.object({ category: z.enum(["fruit", "legume"]).optional() });
 
 export const Route = createFileRoute("/products/")({
   component: ProductsList,
+  validateSearch: (s) => searchSchema.parse(s),
 });
 
 type CatalogProduct = {
@@ -15,54 +21,8 @@ type CatalogProduct = {
   category: "fruit" | "legume";
   price_per_kg: number;
   image_url: string;
+  product_images: { url: string; position: number }[];
 };
-
-const LOCAL_IMAGE_NAMES = [
-  "ail.jpg",
-  "ananas.jpg",
-  "avocat.jpg",
-  "bananes.jpg",
-  "betterave.jpg",
-  "brocolis.jpg",
-  "carottes.jpg",
-  "champignons.jpg",
-  "chou-fleur.jpg",
-  "chou.jpg",
-  "ciboulette.jpg",
-  "fraise.jpg",
-  "fraises.jpg",
-  "fruit-passion.jpg",
-  "gingembre.jpg",
-  "gombo.jpg",
-  "kiwi.jpg",
-  "mandarine.jpg",
-  "mangues.jpg",
-  "mathe.jpg",
-  "oignons-verts.jpg",
-  "oignons.jpg",
-  "orange.jpg",
-  "papaye.jpg",
-  "passion.jpg",
-  "poivrons-rouges-jaunes.jpg",
-  "poivrons-verts.jpg",
-  "pomme-de-terre.jpg",
-  "pomme-rouge-verte.jpg",
-  "raisins.jpg",
-  "tomates.jpg",
-];
-
-const LOCAL_PRODUCTS: CatalogProduct[] = Array.from({ length: 44 }, (_, index) => {
-  const imageName = LOCAL_IMAGE_NAMES[index % LOCAL_IMAGE_NAMES.length];
-  const category = index % 2 === 0 ? "fruit" : "legume";
-
-  return {
-    id: `local-${index + 1}`,
-    name: `Produit local ${String(index + 1).padStart(2, "0")}`,
-    category,
-    price_per_kg: 3500 + (index % 10) * 1000,
-    image_url: `/products/${imageName}`,
-  };
-});
 
 const NAME_TO_IMAGE: Record<string, string> = {
   tomate: "tomates.jpg",
@@ -102,88 +62,148 @@ function pickImageByProductName(name: string) {
   return "/products/placeholder.svg";
 }
 
-function normalizeProductName(name: string | null | undefined) {
-  return (name ?? "").trim().toLowerCase();
-}
-
-function mergeWithLocalFallback(productsFromDb: CatalogProduct[]) {
-  if (productsFromDb.length >= 44) {
-    return productsFromDb;
-  }
-
-  const namesFromDb = new Set(productsFromDb.map((p) => normalizeProductName(p.name)));
-  const localComplement = LOCAL_PRODUCTS.filter((p) => !namesFromDb.has(normalizeProductName(p.name)));
-
-  return [...productsFromDb, ...localComplement].slice(0, 44);
-}
-
 function ProductsList() {
+  const { category } = useSearch({ from: "/products/" });
   const [products, setProducts] = useState<CatalogProduct[]>([]);
+  const [activeCategory, setActiveCategory] = useState<"fruit" | "legume">(category === "legume" ? "legume" : "fruit");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchProducts() {
+  const fetchProducts = useCallback(async (silent = false) => {
+    if (!silent) {
       setLoading(true);
-      setError(null);
-      const { data, error } = await supabase
-        .from("products")
-        .select("id,name,category,price_per_kg")
-        .order("created_at", { ascending: false });
+    }
+    setError(null);
+    const { data, error } = await supabase
+      .from("products")
+      .select("id,name,category,price_per_kg,product_images(url,position)")
+      .order("created_at", { ascending: false });
 
-      if (error) {
-        setError(error.message);
-        setProducts(LOCAL_PRODUCTS);
-      } else {
-        const productsFromDb: CatalogProduct[] = (data ?? []).map((product) => ({
+    if (error) {
+      setError(error.message);
+      setProducts([]);
+    } else {
+      const productsFromDb: CatalogProduct[] = (data ?? []).map((product) => {
+        const firstImage = [...(product.product_images ?? [])]
+          .sort((a, b) => a.position - b.position)
+          .find((img) => !!img.url)?.url;
+
+        return {
           id: product.id,
           name: product.name,
           category: product.category,
           price_per_kg: Number(product.price_per_kg ?? 0),
-          image_url: pickImageByProductName(product.name),
-        }));
+          image_url: firstImage || pickImageByProductName(product.name),
+          product_images: product.product_images ?? [],
+        };
+      });
 
-        setProducts(mergeWithLocalFallback(productsFromDb));
-      }
+      setProducts(productsFromDb);
+    }
+
+    if (!silent) {
       setLoading(false);
     }
-    fetchProducts();
   }, []);
 
-  if (loading) return <div>Chargement...</div>;
-  if (!products.length) return <div>Aucun produit trouvé.</div>;
+  useEffect(() => {
+    setActiveCategory(category === "legume" ? "legume" : "fruit");
+  }, [category]);
+
+  useEffect(() => {
+    fetchProducts();
+
+    const channel = supabase
+      .channel("products-live-updates")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "products" },
+        () => {
+          fetchProducts(true);
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "product_images" },
+        () => {
+          fetchProducts(true);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchProducts]);
+
+  const filteredProducts = useMemo(
+    () => products.filter((product) => product.category === activeCategory),
+    [products, activeCategory],
+  );
 
   return (
-    <div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-10">
       {error ? (
         <div className="mb-4 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          Données partielles depuis Supabase, catalogue local utilisé en secours.
+          Impossible de charger les produits depuis Supabase. Veuillez réessayer.
         </div>
       ) : null}
 
-      <div className="mb-4 text-sm text-muted-foreground">
-        {products.length} produits affichés
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Button
+          type="button"
+          variant={activeCategory === "fruit" ? "default" : "outline"}
+          onClick={() => setActiveCategory("fruit")}
+        >
+          Fruits
+        </Button>
+        <Button
+          type="button"
+          variant={activeCategory === "legume" ? "default" : "outline"}
+          onClick={() => setActiveCategory("legume")}
+        >
+          Légumes
+        </Button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {products.map((product) => (
-        <Card key={product.id}>
-          <CardHeader>{product.name}</CardHeader>
-          <CardContent>
-            <img
-              src={normalizeProductImageUrl(product.image_url) || "/products/placeholder.svg"}
-              alt={product.name}
-              className="w-full h-32 object-cover mb-2"
-              onError={e => (e.currentTarget.src = "/products/placeholder.svg")}
-            />
-            <div>{fcfa(product.price_per_kg)} / kg</div>
-            <div className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
-              {product.category === "fruit" ? "Fruit" : "Légume"}
+      {loading ? (
+        <div>Chargement...</div>
+      ) : !products.length ? (
+        <div>Aucun produit trouvé.</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {filteredProducts.map((product) => (
+            <Card key={product.id}>
+              <CardHeader>{product.name}</CardHeader>
+              <CardContent>
+                <img
+                  src={normalizeProductImageUrl(product.image_url) || "/products/placeholder.svg"}
+                  alt={product.name}
+                  className="w-full h-32 object-cover mb-2"
+                  onError={e => (e.currentTarget.src = "/products/placeholder.svg")}
+                />
+                <div>{fcfa(product.price_per_kg)} / kg</div>
+                <div className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
+                  {product.category === "fruit" ? "Fruit" : "Légume"}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          </div>
+
+          {!filteredProducts.length ? (
+            <div className="mt-4 text-sm text-muted-foreground">
+              Aucun produit dans la catégorie {activeCategory === "fruit" ? "Fruits" : "Légumes"}.
             </div>
-          </CardContent>
-        </Card>
-      ))}
+          ) : null}
+        </>
+      )}
       </div>
+
+      <Footer />
     </div>
   );
 }
