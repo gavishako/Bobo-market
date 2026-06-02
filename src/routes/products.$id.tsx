@@ -89,9 +89,9 @@ function ProductDetail() {
             <p className="mt-2 text-xs sm:text-sm text-muted-foreground">Sous-total : <strong className="text-foreground">{fcfa(Number(data.price_per_kg) * qty)}</strong></p>
           </div>
 
-          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-2 sm:gap-3">
-            <Button className="flex-1 text-sm sm:text-base" size="lg" onClick={addToCart}><ShoppingBasket className="mr-2 h-4 w-4 sm:h-5 sm:w-5" /> <span>Ajouter au panier</span></Button>
-            <Button className="flex-1 text-sm sm:text-base" size="lg" variant="outline" onClick={() => { addToCart(); navigate({ to: "/cart" }); }}><span>Commander</span></Button>
+          <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-3">
+            <Button className="flex-1 min-h-12 text-base sm:text-base font-semibold" size="lg" onClick={addToCart}><ShoppingBasket className="mr-2 h-5 w-5" /> <span>Ajouter au panier</span></Button>
+            <Button className="flex-1 min-h-12 text-base sm:text-base font-semibold" size="lg" variant="outline" onClick={() => { addToCart(); navigate({ to: "/cart" }); }}><span>Commander</span></Button>
           </div>
 
           {data.stock_kg < 5 && <p className="mt-4 text-xs sm:text-sm text-destructive">Plus que {data.stock_kg} kg en stock !</p>}
