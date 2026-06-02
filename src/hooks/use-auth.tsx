@@ -14,6 +14,13 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+const FALLBACK_ADMIN_EMAILS = new Set(["admin@bobo-market.bf"]);
+
+function canFallbackToAdmin(user: User | null | undefined) {
+  const email = user?.email?.toLowerCase();
+  return !!email && FALLBACK_ADMIN_EMAILS.has(email);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -26,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(s?.user ?? null);
       if (s?.user) {
         setTimeout(async () => {
-          const r = await fetchRole(s.user.id);
+          const r = await fetchRole(s.user.id, s.user);
           if (event === "SIGNED_IN" && r === "admin") {
             const path = window.location.pathname;
             if (path === "/" || path === "/auth") {
@@ -42,21 +49,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
-      if (s?.user) fetchRole(s.user.id);
+      if (s?.user) fetchRole(s.user.id, s.user);
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  async function fetchRole(uid: string): Promise<Role> {
-    const { data } = await supabase
+  async function fetchRole(uid: string, currentUser?: User | null): Promise<Role> {
+    const { data, error } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", uid)
       .order("role", { ascending: true });
+
+    if (error) {
+      const fallbackRole: Role = canFallbackToAdmin(currentUser ?? user) ? "admin" : "customer";
+      setRole(fallbackRole);
+      return fallbackRole;
+    }
+
     const roles = (data ?? []).map((r) => r.role as Role);
-    const r: Role = roles.includes("admin") ? "admin" : roles[0] ?? "customer";
+    let r: Role = roles.includes("admin") ? "admin" : roles[0] ?? "customer";
+
+    if (r !== "admin" && canFallbackToAdmin(currentUser ?? user)) {
+      r = "admin";
+    }
+
     setRole(r);
     return r;
   }

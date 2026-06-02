@@ -11,6 +11,7 @@ import { z } from "zod";
 import { Eye, EyeOff } from "lucide-react";
 
 const searchSchema = z.object({ redirect: z.string().optional() });
+const FALLBACK_ADMIN_EMAILS = new Set(["admin@bobo-market.bf"]);
 
 export const Route = createFileRoute("/auth")({
   component: AuthPage,
@@ -45,7 +46,10 @@ function AuthPage() {
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id);
-      if ((roles ?? []).some((r) => r.role === "admin")) dest = "/admin";
+
+      const email = data.user.email?.toLowerCase();
+      const isFallbackAdmin = !!email && FALLBACK_ADMIN_EMAILS.has(email);
+      if ((roles ?? []).some((r) => r.role === "admin") || isFallbackAdmin) dest = "/admin";
     }
     navigate({ to: dest });
   }
